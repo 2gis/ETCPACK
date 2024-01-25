@@ -154,15 +154,14 @@ void setupAlphaTable();
 #define	TABLE_BITS_58H 3
 
 // Global tables
-static uint8 table59T[8] = {3,6,11,16,23,32,41,64};  // 3-bit table for the 59 bit T-mode
-static uint8 table58H[8] = {3,6,11,16,23,32,41,64};  // 3-bit table for the 58 bit H-mode
+constexpr uint8 table59T[8] = {3,6,11,16,23,32,41,64};  // 3-bit table for the 59 bit T-mode
+constexpr uint8 table58H[8] = {3,6,11,16,23,32,41,64};  // 3-bit table for the 58 bit H-mode
 uint8 weight[3] = {1,1,1};			// Color weight
 
 // Enums
-static enum{PATTERN_H = 0, 
-			PATTERN_T = 1};
+constexpr uint8 PATTERN_H = 0,  PATTERN_T = 1;
 
-static enum{MODE_ETC1, MODE_THUMB_T, MODE_THUMB_H, MODE_PLANAR};
+constexpr int MODE_ETC1 = 0, MODE_THUMB_T = 1, MODE_THUMB_H = 2, MODE_PLANAR = 3;
 // The ETC2 package of codecs includes the following codecs:
 //
 // codec                                             enum
@@ -202,11 +201,11 @@ static enum{MODE_ETC1, MODE_THUMB_T, MODE_THUMB_H, MODE_PLANAR};
 // (GL_COMPRESSED_R11_EAC) and signed (GL_COMPRESSED_SIGNED_R11_EAC) version of 
 // the codec.
 // 
-static enum{ETC1_RGB_NO_MIPMAPS,ETC2PACKAGE_RGB_NO_MIPMAPS,ETC2PACKAGE_RGBA_NO_MIPMAPS_OLD,ETC2PACKAGE_RGBA_NO_MIPMAPS,ETC2PACKAGE_RGBA1_NO_MIPMAPS,ETC2PACKAGE_R_NO_MIPMAPS,ETC2PACKAGE_RG_NO_MIPMAPS,ETC2PACKAGE_R_SIGNED_NO_MIPMAPS,ETC2PACKAGE_RG_SIGNED_NO_MIPMAPS,ETC2PACKAGE_sRGB_NO_MIPMAPS,ETC2PACKAGE_sRGBA_NO_MIPMAPS,ETC2PACKAGE_sRGBA1_NO_MIPMAPS};
-static enum {MODE_COMPRESS, MODE_UNCOMPRESS, MODE_PSNR};
-static enum {SPEED_SLOW, SPEED_FAST, SPEED_MEDIUM};
-static enum {METRIC_PERCEPTUAL, METRIC_NONPERCEPTUAL};
-static enum {CODEC_ETC, CODEC_ETC2};
+constexpr short ETC1_RGB_NO_MIPMAPS = 0, ETC2PACKAGE_RGB_NO_MIPMAPS = 1, ETC2PACKAGE_RGBA_NO_MIPMAPS_OLD = 2,ETC2PACKAGE_RGBA_NO_MIPMAPS = 3,ETC2PACKAGE_RGBA1_NO_MIPMAPS = 4,ETC2PACKAGE_R_NO_MIPMAPS = 5,ETC2PACKAGE_RG_NO_MIPMAPS = 6,ETC2PACKAGE_R_SIGNED_NO_MIPMAPS = 7,ETC2PACKAGE_RG_SIGNED_NO_MIPMAPS = 8,ETC2PACKAGE_sRGB_NO_MIPMAPS = 9,ETC2PACKAGE_sRGBA_NO_MIPMAPS = 10,ETC2PACKAGE_sRGBA1_NO_MIPMAPS = 11;
+constexpr int MODE_COMPRESS = 0, MODE_UNCOMPRESS = 1, MODE_PSNR = 2;
+constexpr int SPEED_SLOW = 0, SPEED_FAST = 1, SPEED_MEDIUM = 2;
+constexpr int METRIC_PERCEPTUAL = 0, METRIC_NONPERCEPTUAL = 1;
+constexpr int CODEC_ETC = 0, CODEC_ETC2 = 1;
 
 int mode = MODE_COMPRESS;
 int speed = SPEED_FAST;
@@ -244,7 +243,7 @@ KTX_header;
 #define KTX_ENDIAN_REF      (0x04030201)
 #define KTX_ENDIAN_REF_REV  (0x01020304)
 
-static enum {GL_R=0x1903,GL_RG=0x8227,GL_RGB=0x1907,GL_RGBA=0x1908};
+static int GL_R=0x1903,GL_RG=0x8227,GL_RGB=0x1907,GL_RGBA=0x1908;
 #define GL_SRGB                                          0x8C40
 #define GL_SRGB8                                         0x8C41
 #define GL_SRGB8_ALPHA8                                  0x8C43
@@ -298,7 +297,7 @@ int indexConversion(int pixelIndices)
 
 // Tests if a file exists.
 // NO WARRANTY --- SEE STATEMENT IN TOP OF FILE (C) Ericsson AB 2005-2013. All Rights Reserved.
-bool fileExist(char *filename)
+bool fileExist(const char *filename)
 {
 	FILE *f=NULL;
 	if((f=fopen(filename,"rb"))!=NULL)
@@ -15882,9 +15881,6 @@ void compressFile(char *srcfile,char *dstfile)
 	uint8 *srcimg;
 	int width,height;
 	int extendedwidth, extendedheight;
-	struct _timeb tstruct;
-	int tstart;
-	int tstop;
 	// 0: compress from .any to .pkm with SPEED_FAST, METRIC_NONPERCEPTUAL, ETC 
 	// 1: compress from .any to .pkm with SPEED_MEDIUM, METRIC_NONPERCEPTUAL, ETC
 	// 2: compress from .any to .pkm with SPEED_SLOW, METRIC_NONPERCEPTUAL, ETC
@@ -15959,14 +15955,7 @@ void compressFile(char *srcfile,char *dstfile)
 			}
 			printf("Compressing...\n");
 
-			tstart=time(NULL);
-			_ftime( &tstruct );
-			tstart=tstart*1000+tstruct.millitm;
 			compressImageFile(srcimg,alphaimg,width,height,dstfile,extendedwidth, extendedheight);			
-			tstop = time(NULL);
-			_ftime( &tstruct );
-			tstop = tstop*1000+tstruct.millitm;
-			printf( "It took %u milliseconds to compress:\n", tstop - tstart);
 			calculatePSNRfile(dstfile,srcimg,alphaimg);
 		}
 	}
